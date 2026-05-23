@@ -1,0 +1,16 @@
+node_modules/
+dist/
+.env
+.env.local
+*.log
+.DS_Store
+
+# Prisma generated client (regenerated on install)
+server/node_modules/.prisma/
+
+# Face-api weights (download on demand)
+server/models/
+
+# Vite build output
+client/dist/
+LOOM_SCRIPT.md
