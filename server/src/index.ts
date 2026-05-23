@@ -1,9 +1,13 @@
+// MUST be first: patches Node 22+ util before any module loads tfjs-node.
+import "./polyfills";
+
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 
 import { config } from "./config";
 import { imagesRouter } from "./routes/images";
+import { configRouter } from "./routes/config";
 import { errorHandler } from "./middleware/errorHandler";
 import { ensureBucket } from "./s3";
 
@@ -28,6 +32,7 @@ async function main() {
     res.json({ ok: true });
   });
 
+  app.use("/api/config", configRouter);
   app.use("/api/images", imagesRouter);
 
   app.use(errorHandler);

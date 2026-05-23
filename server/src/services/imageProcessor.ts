@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "../db";
 import { runPipeline } from "../validators";
 import { registerHandler } from "../queue";
@@ -51,7 +52,7 @@ async function processImage(payload: ProcessImagePayload): Promise<void> {
     where: { id: imageId },
     data: {
       status: report.passed ? "ACCEPTED" : "REJECTED",
-      rejectionReasons: report.passed ? null : report.rejectionReasons,
+      rejectionReasons: report.passed ? Prisma.JsonNull : report.rejectionReasons,
       width: report.computed.width ?? null,
       height: report.computed.height ?? null,
       blurScore: report.computed.blurScore ?? null,

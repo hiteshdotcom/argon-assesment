@@ -331,6 +331,31 @@ button {
 .reassure-row svg { flex-shrink: 0; margin-top: 2px; color: var(--dd-ink); }
 .reassure-row strong { color: var(--dd-ink); font-weight: 700; }
 
+/* Inline informational / warning notice (e.g. face model missing) */
+.notice {
+  display: flex; gap: 10px; align-items: flex-start;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.notice svg { flex-shrink: 0; margin-top: 2px; }
+.notice strong { font-weight: 700; }
+.notice code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  background: rgba(0,0,0,.06);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+.notice-warn {
+  background: var(--warn-bg);
+  border: 1px solid var(--warn-brd);
+  color: var(--warn);
+}
+.notice-warn strong, .notice-warn code { color: var(--dd-ink); }
+.notice-warn svg { color: var(--warn); }
+
 /* ─────────── Right column ─────────── */
 .app-main {
   display: flex; flex-direction: column; gap: 24px;
@@ -774,12 +799,15 @@ button {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* ─────────── Responsive (collapse to single column) ─────────── */
+/* ─────────── Responsive — tablet (≤ 900px) ─────────── */
 @media (max-width: 900px) {
   .app-top {
     grid-template-columns: auto 1fr auto;
     padding: 12px 14px;
     gap: 12px;
+    /* Respect iOS notch / Android status-bar inset. */
+    padding-left: max(14px, env(safe-area-inset-left));
+    padding-right: max(14px, env(safe-area-inset-right));
   }
   .brand-name { display: none; }
   .progress-strip-label { font-size: 12px; }
@@ -787,6 +815,9 @@ button {
     grid-template-columns: 1fr;
     gap: 16px;
     padding: 16px;
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
   }
   .upload-sidebar { position: static; gap: 12px; }
   .upload-title { font-size: 22px; }
@@ -802,5 +833,100 @@ button {
   .pipeline-step .ps-desc { display: none; }
   .photo-reason-text { font-size: 12px; }
   .inspector { width: 100%; }
-  .toast { right: 16px; left: 16px; bottom: 16px; min-width: 0; max-width: none; }
+  .toast {
+    right: 16px; left: 16px;
+    bottom: max(16px, env(safe-area-inset-bottom));
+    min-width: 0; max-width: none;
+  }
+}
+
+/* ─────────── Responsive — phone (≤ 480px) ─────────── */
+@media (max-width: 480px) {
+  /* Top bar: tighter, compact close target */
+  .app-top {
+    padding: 10px 12px;
+    gap: 10px;
+  }
+  .brand-mark { width: 28px; height: 28px; border-radius: 8px; }
+  .app-top .close {
+    width: 40px; height: 40px;   /* ≥ 44px target with touch slop on most phones */
+  }
+
+  /* Body: edge-snug, smaller gaps */
+  .app-body { padding: 12px; gap: 14px; }
+
+  /* Sidebar: text scaled for narrow column, icon + heading tighter */
+  .upload-sidebar { gap: 10px; }
+  .upload-icon-frame { width: 40px; height: 40px; border-radius: 10px; }
+  .upload-title { font-size: 20px; }
+  .upload-copy { font-size: 12.5px; line-height: 1.5; }
+
+  /* Dropzone: bigger tap target, label scales down */
+  .dropzone { padding: 22px 14px; min-height: 140px; }
+  .dropzone-cta { padding: 12px 22px; }   /* keep ≥ 44px tappable */
+  .dropzone-hint { font-size: 13px; }
+
+  /* Reassurance panel: keep it readable */
+  .reassure { padding: 10px 12px; font-size: 11.5px; }
+
+  /* 2-column photo grid — matches the design at 390px */
+  .photo-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .photo-tile { border-radius: 10px; }
+
+  /* Make the delete chip easier to hit on a phone */
+  .tile-delete { width: 32px; height: 32px; top: 6px; right: 6px; }
+  .tile-good { width: 22px; height: 22px; top: 6px; left: 6px; }
+
+  /* Panel chrome */
+  .panel { padding: 14px; border-radius: 10px; }
+  .panel-head { gap: 6px; margin-bottom: 12px; }
+  .panel-head-l h2 { font-size: 15px; }
+  .panel-head-l p { font-size: 12px; }
+  .panel-progress { margin-bottom: 14px; }
+
+  /* Processing pipeline: 3 chips × 2 rows */
+  .proc-banner { padding: 12px 14px; gap: 12px; }
+  .proc-banner-icon { width: 32px; height: 32px; }
+  .proc-banner-title { font-size: 14px; }
+  .proc-banner-sub { font-size: 11.5px; }
+  .pipeline-step { padding: 6px 8px; }
+  .pipeline-step .ps-name { font-size: 11px; }
+
+  /* Footer: stack and pad */
+  .footer-actions {
+    flex-direction: column-reverse;     /* primary CTA on top, easier to reach */
+    align-items: stretch;
+    gap: 10px;
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+  }
+  .footer-actions .btn {
+    width: 100%;
+    justify-content: center;
+    padding: 14px 18px;
+    font-size: 15px;
+  }
+
+  /* Inspector: lock to full screen + safe-area */
+  .inspector-head { padding: 14px 16px; padding-top: max(14px, env(safe-area-inset-top)); }
+  .inspector-body { padding: 14px; padding-bottom: max(14px, env(safe-area-inset-bottom)); gap: 12px; }
+  .inspector-head h3 { font-size: 14px; max-width: 240px; }
+  .rule-row { padding: 10px; }
+  .rule-row .rr-icon { width: 28px; height: 28px; }
+
+  /* Toast: snug to edges */
+  .toast { padding: 10px 12px 10px 10px; }
+  .toast-title { font-size: 12.5px; }
+  .toast-sub { font-size: 11.5px; }
+}
+
+/* ─────────── Touch device hardening ─────────── */
+@media (hover: none) and (pointer: coarse) {
+  /* Hover transforms cause sticky-pressed states on touch — disable them. */
+  .photo-tile:hover { transform: none; box-shadow: none; }
+  .photo-tile:active { transform: scale(0.98); }
+  .dropzone-cta:active { background: #9c0030; }
+  .btn:active { transform: scale(0.98); }
 }

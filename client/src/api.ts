@@ -46,3 +46,22 @@ export async function deleteImage(id: string): Promise<void> {
   const res = await fetch(`${BASE}/images/${id}`, { method: "DELETE" });
   if (!res.ok && res.status !== 204) throw new Error(`Delete failed (${res.status})`);
 }
+
+export interface ServerConfig {
+  faceModelLoaded: boolean;
+  thresholds: {
+    minWidth: number;
+    minHeight: number;
+    minFileBytes: number;
+    maxUploadBytes: number;
+    blurVarianceMin: number;
+    similarityHammingMax: number;
+    faceAreaMinRatio: number;
+  };
+}
+
+export async function getConfig(): Promise<ServerConfig> {
+  const res = await fetch(`${BASE}/config`);
+  if (!res.ok) throw new Error(`Config fetch failed (${res.status})`);
+  return res.json();
+}

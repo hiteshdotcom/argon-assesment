@@ -6,9 +6,16 @@ interface Props {
   target: number;
   currentGood: number;
   onFiles: (files: FileList | File[]) => void;
+  faceModelLoaded: boolean;
 }
 
-export function UploadSidebar({ uploading, target, currentGood, onFiles }: Props) {
+export function UploadSidebar({
+  uploading,
+  target,
+  currentGood,
+  onFiles,
+  faceModelLoaded,
+}: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
   const remaining = Math.max(0, target - currentGood);
@@ -107,6 +114,17 @@ export function UploadSidebar({ uploading, target, currentGood, onFiles }: Props
           </div>
         </div>
       </div>
+
+      {!faceModelLoaded && (
+        <div className="notice notice-warn">
+          <Icon name="sparkles" size={14} stroke={2} />
+          <div>
+            <strong>Face checks are off.</strong> The face-api model isn't installed, so
+            we can't catch missing or extra faces. Add weights to{" "}
+            <code>server/models/</code> to enable them.
+          </div>
+        </div>
+      )}
     </aside>
   );
 }

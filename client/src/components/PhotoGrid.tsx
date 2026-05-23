@@ -1,6 +1,6 @@
 import type { ImageRow } from "../api";
 import { Icon } from "./Icon";
-import { REASON_CAPTIONS, primaryRejectionRule, failedCount } from "../lib/rules";
+import { RULE_DEFS, failedRules, friendlyCaption, primaryRejectionRule } from "../lib/rules";
 
 interface AcceptedTileProps {
   img: ImageRow;
@@ -36,12 +36,21 @@ interface RejectedCellProps {
   img: ImageRow;
   onDelete: (id: string) => void;
   onClick: () => void;
+  faceModelLoaded: boolean;
 }
 
-export function RejectedCell({ img, onDelete, onClick }: RejectedCellProps) {
-  const reasonKey = primaryRejectionRule(img);
-  const reason = reasonKey ? REASON_CAPTIONS[reasonKey] : "Did not pass review";
-  const failed = failedCount(img);
+export function RejectedCell({ img, onDelete, onClick, faceModelLoaded }: RejectedCellProps) {
+  const primary = primaryRejectionRule(img, { faceModelLoaded });
+  const allFailed = failedRules(img, { faceModelLoaded });
+
+  const { headline, detail } = primary
+    ? friendlyCaption(primary)
+    : { headline: "Did not pass review", detail: undefined };
+
+  // List the names of the OTHER failing rules so a glance shows the full picture.
+  const otherNames = allFailed
+    .filter((r) => r.id !== primary?.id)
+    .map((r) => RULE_DEFS.find((d) => d.id === r.id)?.name ?? r.id);
 
   return (
     <div className="photo-cell fade-in">
@@ -59,12 +68,13 @@ export function RejectedCell({ img, onDelete, onClick }: RejectedCellProps) {
         </button>
       </div>
       <div className="photo-reason">
-        <span className="photo-reason-text" onClick={onClick}>
-          {reason}
+        <span className="photo-reason-text" onClick={onClick} title={detail}>
+          {headline}
         </span>
-        {failed > 1 && (
+        {detail && <span className="photo-reason-sub">{detail}</span>}
+        {otherNames.length > 0 && (
           <span className="photo-reason-sub">
-            +{failed - 1} other issue{failed - 1 !== 1 ? "s" : ""}
+            Also failed: {otherNames.join(", ")}
           </span>
         )}
       </div>

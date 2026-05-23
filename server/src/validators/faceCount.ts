@@ -13,9 +13,17 @@ export const faceCountValidator: Validator = {
 
     const faces = await detect(ctx.buffer);
     ctx.computed.faceCount = faces.length;
-    // Cache boxes + image dims for faceSize so it doesn't re-detect.
-    const meta = await sharp(ctx.buffer).metadata();
-    ctx._faces = { boxes: faces, imageWidth: meta.width ?? 0, imageHeight: meta.height ?? 0 };
+
+    // Prefer dims already computed by the dimensions validator earlier in the
+    // pipeline; fall back to a fresh metadata read if it didn't run.
+    let imageWidth = ctx.computed.width ?? 0;
+    let imageHeight = ctx.computed.height ?? 0;
+    if (imageWidth === 0 || imageHeight === 0) {
+      const meta = await sharp(ctx.buffer).metadata();
+      imageWidth = meta.width ?? 0;
+      imageHeight = meta.height ?? 0;
+    }
+    ctx._faces = { boxes: faces, imageWidth, imageHeight };
 
     if (faces.length !== 1) {
       return {
